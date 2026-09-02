@@ -1,0 +1,7 @@
+=======
+HOSTNAME: localhost.localdomain
+UPTIME: up 14 hours, 50 minutes
+DISK USAGE: /dev/mapper/rl-root   35G  6.1G   29G  18% /
+MEMORAGE USAGE: 2.3Gi/3.6Gi
+PROCESS COUNT: 302
+=======

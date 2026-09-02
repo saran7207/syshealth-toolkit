@@ -23,3 +23,8 @@ cat << EOF
 # we always use double quote unless we want to split the variables
 EOF
 
+# --- system metrics collection ---
+UPTIME=$(uptime -p)
+DISK_USAGE=$(df -h / | tail -1)
+MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
+PROCESS_COUNT=$(ps -e | wc -l)

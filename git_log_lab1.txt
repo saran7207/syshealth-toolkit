@@ -1,0 +1,6 @@
+* f634c20 (HEAD -> main, origin/main)  output file
+* 853ddc0 add positional handling and report output
+* 2771de1 implemented command substitution for system metrics
+* dcca458 demonstrate quoting rules with explanatory comments
+* f60cc75 ADD shebang and make syshealth.sh executable
+* 80047c7 Initial commit: projectt skeleton and README

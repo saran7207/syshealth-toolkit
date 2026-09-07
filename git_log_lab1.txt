@@ -1,4 +1,6 @@
-* f634c20 (HEAD -> main, origin/main)  output file
+* 123591a (HEAD -> main) Updated
+* a566107 (origin/main) git logs for lab1
+* f634c20  output file
 * 853ddc0 add positional handling and report output
 * 2771de1 implemented command substitution for system metrics
 * dcca458 demonstrate quoting rules with explanatory comments

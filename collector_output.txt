@@ -1,7 +1,8 @@
-=======
-HOSTNAME: localhost.localdomain
-UPTIME: up 14 hours, 50 minutes
-DISK USAGE: /dev/mapper/rl-root   35G  6.1G   29G  18% /
-MEMORAGE USAGE: 2.3Gi/3.6Gi
-PROCESS COUNT: 302
-=======
+====================
+System Health Report - 2026-09-07 03:39:25
+Hostname     : localhost.localdomain
+Uptime       : up 1 day, 3 hours, 1 minute
+Disk /       : /dev/mapper/rl-root   35G  6.2G   29G  18% /
+Memory used  : 2.7Gi/3.6Gi
+Total processes : 306
+====================

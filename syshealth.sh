@@ -15,6 +15,26 @@ CPU_THRESHOLD=75
 MEM_THRESHOLD=85
 DISK_THRESHOLD=85
 
+# This function prints either an OK or ALERT message in color.
+# Using a function avoids repeating the same echo logic everywhere.
+#
+# 'local' is used so 'status' and 'message' do not overwrite variables
+# outside the function. Without 'local', these names could accidentally
+# collide with global variables, causing unpredictable behavior.
+#
+# Inside [ ], '=' is the POSIX-standard string comparison operator.
+# '==' works in Bash but is not portable; '-eq' is numeric-only.
+print_status() 
+{
+local status="$1"
+local message="$2"
+if [ "$status" = "OK" ]; then # we use = becuase its the posix standard strin comparison operator insdie []
+	echo -e "\e[32m OK: $message\e[0m" # -e flag is used to tell echo to use escape characters
+else
+	echo -e "\e[31m ALERT: $message\e[0m" # [0m is used to end the colored text and get it back to default
+fi
+}
+
 # ========================================
 # Variables and demonstrating how to quote
 # ========================================

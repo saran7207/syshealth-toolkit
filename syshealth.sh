@@ -115,7 +115,7 @@ for mount in / /home /var; do
 		PCT=$(df "$mount" | tail -1 | awk '{gsub("%",""); print $5}')
 		# Compare mount usage against threshold
 		if (( PCT > DISK_THRESHOLD )); then
-			print_status "ALERT" "Disk usage on $mount is ${PCT}% (threshold ${DISK_PCT}%)"
+			print_status "ALERT" "Disk usage on $mount is ${PCT}% (threshold ${DISK_THRESHOLD}%)"
 			HEALTH_STATUS=1
 		else
 			print_status "OK" "Disk usage on $mount is ${PCT}%"

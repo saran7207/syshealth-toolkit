@@ -78,7 +78,7 @@ MEM_PCT=$(free | awk '/Mem:/ {printf "%.0f", $3/$2*100}')
 # grep '^%CPU' → isolate the CPU summary line
 # awk '{print 100 - $8}' → subtract idle percentage to get usage
 # cut -d. -f1 → remove decimals for integer comparison
-CPU_PCT=$(top -bn1 | grep '^%CPU' | awk '{print 100 - $8}' | cut -d. -f1)
+CPU_PCT=$(top -bn1 | grep '^%Cpu' | awk '{print 100 - $8}' | cut -d. -f1)
 
 print_status "CHECK" "Running system health analysis..."
 
@@ -114,8 +114,8 @@ for mount in / /home /var; do
 		# Remove % sign for numeric comparison
 		PCT=$(df "$mount" | tail -1 | awk '{gsub("%",""); print $5}')
 		# Compare mount usage against threshold
-		if (( PCT > DISK_PCT )); then
-			print_status "ALERTS" "Disk usage on $mount is ${PCT}% (threshold ${DISK_PCT}%)"
+		if (( PCT > DISK_THRESHOLD )); then
+			print_status "ALERT" "Disk usage on $mount is ${PCT}% (threshold ${DISK_PCT}%)"
 			HEALTH_STATUS=1
 		else
 			print_status "OK" "Disk usage on $mount is ${PCT}%"
@@ -133,7 +133,7 @@ if (( MEM_PCT > MEM_THRESHOLD )); then
 	print_status "ALERT" "Memory usage ${MEM_PCT}% (threshold ${MEM_THRESHOLD}%)"
 	HEALTH_STATUS=1
 else
-	print_status "OK" "Memory usage is ${DISK_PCT}%"
+	print_status "OK" "Memory usage is ${MEM_PCT}%"
 fi
 
 # ===========================

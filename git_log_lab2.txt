@@ -1,0 +1,13 @@
+* 5eade93 (HEAD -> main, origin/main) add for-loop for multiple mount points, update exit code handling, cleaning up comments
+* 5a4589c add parsing and conditional checks for disk, mem and cpu
+* df1bde9 implement git status function with color coded output
+* fa1c61b AdD threshold variables for cpu, mem and disk
+* b5e65a8 Updated log
+* 123591a Updated
+* a566107 git logs for lab1
+* f634c20  output file
+* 853ddc0 add positional handling and report output
+* 2771de1 implemented command substitution for system metrics
+* dcca458 demonstrate quoting rules with explanatory comments
+* f60cc75 ADD shebang and make syshealth.sh executable
+* 80047c7 Initial commit: projectt skeleton and README

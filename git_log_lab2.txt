@@ -1,6 +1,17 @@
-* 5eade93 (HEAD -> main, origin/main) add for-loop for multiple mount points, update exit code handling, cleaning up comments
-* 5a4589c add parsing and conditional checks for disk, mem and cpu
-* df1bde9 implement git status function with color coded output
+* 8be61e1 (HEAD -> main, origin/main) fixing bugs
+* 0fdd352 logs for lab2
+* 3a23c11 add for-loop for multiple mount points, update exit code handling, cleaning up comments
+* 6bfd369 add parsing and conditional checks for disk, mem and cpu
+* f55f52b implement print status function with color coded output
+| *   7c1afcf (refs/stash) WIP on main: aef549f logs for lab2
+| |\  
+| | * a4636db index on main: aef549f logs for lab2
+| |/  
+| * aef549f logs for lab2
+| * 5eade93 add for-loop for multiple mount points, update exit code handling, cleaning up comments
+| * 5a4589c add parsing and conditional checks for disk, mem and cpu
+| * df1bde9 implement git status function with color coded output
+|/  
 * fa1c61b AdD threshold variables for cpu, mem and disk
 * b5e65a8 Updated log
 * 123591a Updated
@@ -10,4 +21,3 @@
 * 2771de1 implemented command substitution for system metrics
 * dcca458 demonstrate quoting rules with explanatory comments
 * f60cc75 ADD shebang and make syshealth.sh executable
-* 80047c7 Initial commit: projectt skeleton and README

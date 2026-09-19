@@ -60,6 +60,28 @@ DISK_USAGE=$(df -h / | tail -1) # storage usage
 MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}') # RAM usage
 PROCESS_COUNT=$(ps -e | wc -l) # processes running
 
+# ========================================================================
+# Numeric metrics for threshold comparison
+# These versions remove symbols and formatting so arithmetic can be done.
+# ========================================================================
+
+# df prints disk usage like "85%". gsub("%","") removes the % so the value
+# becomes a pure integer. If gsub were skipped, arithmetic comparison would fail.
+DISK_PCT=$(df / | tail -1 | awk '{gsub("%",""); printf $5}') 
+
+# free prints memory usage as raw numbers. printf "%.0f" rounds the result
+# to a whole number. Using plain 'print' may produce decimals, which break (( )).
+MEM_PCT=$(free | awk '/Mem:/ {printf "%.0f", $3/$2*100}') 
+
+# CPU extraction pipeline:
+# top -bn1 → batch mode, one iteration, non-interactive
+# grep '^%CPU' → isolate the CPU summary line
+# awk '{print 100 - $8}' → subtract idle percentage to get usage
+# cut -d. -f1 → remove decimals for integer comparison
+CPU_PCT=$(top -bn1 | grep '^%CPU' | awk '{print 100 - $8}' | cut -d. -f1)
+
+print_status "CHECK" "Running system health analysis..."
+
 # OUTPUT_FILE stores the filename passed as an argument
 # ${1:-} means if $1 is provided, use it, else use an empty string
 OUTPUT_FILE="${1:-}" 

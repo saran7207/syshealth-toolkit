@@ -82,12 +82,84 @@ CPU_PCT=$(top -bn1 | grep '^%CPU' | awk '{print 100 - $8}' | cut -d. -f1)
 
 print_status "CHECK" "Running system health analysis..."
 
-# OUTPUT_FILE stores the filename passed as an argument
-# ${1:-} means if $1 is provided, use it, else use an empty string
+# HEALTH_STATUS acts as a flag:
+# 0 = everything healthy
+# 1 = at least one alert occurred
+# It is never reset back to 0 because once a failure happens,
+# the system is considered unhealthy overall.
+HEALTH_STATUS=0
+
+# Disk usage check for root /
+# (( )) is used because it performs arithmetic comparison directly.
+# [ ] would require -gt and quoting, and is less readable for math.
+if (( DISK_PCT > DISK_THRESHOLD )); then
+	print_status "ALERT" "Disk usage on / is ${DISK_PCT}% (threshold ${DISK_THRESHOLD}%)"
+	HEALTH_STATUS=1
+else 
+	print_status "OK" "Disk usage on / is ${DISK_PCT}%"
+fi
+
+# ==========================================================
+# Loop through multiple mount points
+# Using a loop avoids repeating the same code three times.
+# Adding or removing mount points becomes trivial.
+# ==========================================================
+for mount in / /home /var; do
+
+	# mountpoint -q suppresses normal output; 2>/dev/null hides error messages
+    	# such as "not a mountpoint". The fallback [ "$mount" = "/" ] ensures
+    	# root is always treated as valid even if mountpoint behaves differently.
+	if mountpoint -q "$mount" 2>/dev/null || [ "$mount" = "/" ]; then
+	
+		# Remove % sign for numeric comparison
+		PCT=$(df "$mount" | tail -1 | awk '{gsub("%",""); print $5}')
+		# Compare mount usage against threshold
+		if (( PCT > DISK_PCT )); then
+			print_status "ALERTS" "Disk usage on $mount is ${PCT}% (threshold ${DISK_PCT}%)"
+			HEALTH_STATUS=1
+		else
+			print_status "OK" "Disk usage on $mount is ${PCT}%"
+		fi
+	else
+		print_status "OK" "Mount point $mount does not exist or is not a mountpoint on this system"
+	fi
+done
+
+
+# ===========================
+# Memory usage check
+# ===========================
+if (( MEM_PCT > MEM_THRESHOLD )); then
+	print_status "ALERT" "Memory usage ${MEM_PCT}% (threshold ${MEM_THRESHOLD}%)"
+	HEALTH_STATUS=1
+else
+	print_status "OK" "Memory usage is ${DISK_PCT}%"
+fi
+
+# ===========================
+# CPU usage check
+# ===========================
+if (( CPU_PCT > CPU_THRESHOLD )); then
+	print_status "ALERT" "Cpu usage is ${CPU_PCT}% (threshold ${CPU_THRESHOLD}%)"
+	HEALTH_STATUS=1
+else 
+	print_status "OK" "CPU usage is ${CPU_PCT}%"
+fi
+
+
+# ===========================
+# Output file handling
+# ${1:-} means: use argument 1 if provided, otherwise empty string.
+# ===========================
 OUTPUT_FILE="${1:-}" 
 
 # ===============================
-# Function to print system report
+# print_report() — final summary
+# printf is used for consistent formatting.
+# The health status line uses && and ||:
+# command && A || B means:
+# If command succeeds, run A; otherwise run B.
+# Only one of the two echoes will run.
 # ===============================
 print_report() 
 {
@@ -99,27 +171,31 @@ printf "Uptime       : %s\n" "$UPTIME" # prints uptime
 printf "Disk /       : %s\n" "$DISK_USAGE" # prints disk
 printf "Memory used  : %s\n" "$MEMORY_USAGE" # prints memory used
 printf "Total processes : %s\n" "$PROCESS_COUNT" # prints total proceses
+printf "Health status   : %s\n" "$([ "$HEALTH_STATUS" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - See alerts above")"
 printf "====================\n"
 }
 
-# To check if there was an argument given 
-# -n checks if the variable length is zero
+# ===========================
+# Write report to file or terminal
+# -n checks if OUTPUT_FILE is non-empty.
+# ===========================
 if [ -n "$OUTPUT_FILE" ]; then
 	print_report > "$OUTPUT_FILE" # redirects the output to the given file
-	echo "report written to $OUTPUT_FILE" 
+	echo "Report written to $OUTPUT_FILE (alerts were printed to terminal)" 
 else
 	print_report # call print_report function which prints to the terminal
 fi
 
-# ================
-# Exit status code
-# ================
+# ===========================
+# Exit code
+# Exit codes matter because other programs (cron, systemd, CI pipelines)
+# rely on them to detect success/failure. Humans may read the report,
+# but automation reads the exit code.
+# ===========================
+exit "${HEALTH_STATUS:-0}"
 
-# Status code 0 is used to indicate successful execution
-exit 0
 
 
-# 
 
 
 

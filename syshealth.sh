@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ==============================
 # syshealth.sh - System health $ Log analysis toolkit
-# Lab 1 - Data Collector
-# Author - Saran saai dommaraju
-# Date - $(date +%Y-%m-%d)
+# Lab 3 - Refactoring into Functions
+# Author: Saran saai dommaraju
+# Date: $(date +%Y-%m-%d)
 # ==============================
 
 # ================================
 # Defining the threshold variables 
-# we do this because it mkaes the script easier to maintain. if we later want to change these limits it can be done in one 
+# we do this because it makes the script easier to maintain. if we later want to change these limits it can be done at one 
 # place. it makes the script more readable
 # ================================
 CPU_THRESHOLD=75
@@ -26,13 +26,62 @@ DISK_THRESHOLD=85
 # '==' works in Bash but is not portable; '-eq' is numeric-only.
 print_status() 
 {
-local status="$1"
-local message="$2"
-if [ "$status" = "OK" ]; then # we use = becuase its the posix standard strin comparison operator insdie []
-	echo -e "\e[32m OK: $message\e[0m" # -e flag is used to tell echo to use escape characters
-else
-	echo -e "\e[31m ALERT: $message\e[0m" # [0m is used to end the colored text and get it back to default
-fi
+	local status="$1"
+	local message="$2"
+	if [ "$status" = "OK" ]; then # we use = because its the posix standard string comparison operator inside []
+		echo -e "\e[32m OK: $message\e[0m" # -e flag is used to tell echo to use escape characters
+	else
+		echo -e "\e[31m ALERT: $message\e[0m" # [0m is used to end the colored text and get it back to default
+	fi
+}
+
+check_disk_usage() {
+	local mount="$1"
+	local pct threshold
+	threshold="$DISK_THRESHOLD"
+	
+	if ! mountpoint -q "$mount" 2>/dev/null && [ "$mount" != "/" ]; then
+		print_status "OK" "Mount point $mount does not exist on this system"
+		return 0	
+	fi
+	
+	pct=$(df "$mount" | tail -1 | awk '{gsub("%",""); print $5}')
+	
+	if (( pct > threshold )); then
+		print_status "ALERT" "Disk usage on $mount is ${pct}% (threshold ${threshold}%)"
+		return 1
+	else 
+		print_status "OK" "Disk usage on $mount is ${pct}%"
+		return 0
+	fi
+}
+
+check_memory_usage() {
+	local pct threshold
+	threshold="$MEM_THRESHOLD"
+	pct=$(free | awk '/Mem:/ {printf "%.0f", $3/$2*100}')
+	
+	if (( pct > threshold )); then
+		print_status "ALERT" "Memory usage is ${pct}% (threshold ${threshold}%)"
+		return 1
+	else
+		print_status "OK" "Memory usage is ${pct}%"
+		return 0
+	fi
+}
+
+check_cpu_usage() {
+	local pct threshold
+	threshold="$CPU_THRESHOLD"
+	pct=$(top -bn1 | grep '^%CPU' | awk '{print 100 - $8}' | cut -d. -f1)
+	
+	if ((pct > threshold )); then
+		print_status "ALERT" "CPU usage is ${pct}% (threshold ${threshold}%)"
+		return 1
+	else
+		print_status "OK" "CPU usage is ${pct}%"
+		return 0
+	fi
 }
 
 # ========================================
@@ -193,6 +242,15 @@ fi
 # but automation reads the exit code.
 # ===========================
 exit "${HEALTH_STATUS:-0}"
+
+
+main() {
+	parse_arguments "$@"
+	run_health_checks
+	generate_report
+}
+
+main
 
 
 

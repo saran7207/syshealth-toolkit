@@ -1,9 +1,9 @@
 ====================
-System Health Report - 2026-10-09 20:49:08
+System Health Report - 2026-10-09 21:20:02
 Hostname     : saran-IdeaPad-Slim-5-13ARP10
-Uptime       : up 2 hours, 42 minutes
+Uptime       : up 3 hours, 13 minutes
 Disk /       : /dev/nvme0n1p5   98G   13G   81G  14% /
-Memory used  : 3.5Gi/12Gi
-Total processes : 408
+Memory used  : 3.8Gi/12Gi
+Total processes : 407
 Health status   : HEALTHY
 ====================

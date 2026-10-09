@@ -170,5 +170,5 @@ main() {
 }
 
 # Starting the program
-main
+main "$@"
 

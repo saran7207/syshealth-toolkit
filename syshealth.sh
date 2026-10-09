@@ -280,8 +280,17 @@ exit "${HEALTH_STATUS:-0}"
 
 main() {
 	parse_arguments "$@"
+	
 	run_health_checks
-	generate_report
+	
+	if [ -n "$OUTPUT_FILE" ]; then
+		generate_report > "$OUTPUT_FILE"
+		echo "Report written to $OUTPUT_FILE"
+	else
+		generate_report
+	fi
+	
+	exit "${HEALTH_STATUS:-0}"
 }
 
 main

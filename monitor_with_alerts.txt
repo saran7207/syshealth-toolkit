@@ -1,9 +1,9 @@
 ====================
-System Health Report - 2026-09-19 16:18:39
-Hostname     : SaransaaiDommaraju
-Uptime       : up 1 day, 22 hours, 26 minutes
-Disk /       : /dev/mapper/rl-root   35G  6.2G   29G  18% /
-Memory used  : 2.8Gi/3.6Gi
-Total processes : 304
+System Health Report - 2026-10-09 20:49:08
+Hostname     : saran-IdeaPad-Slim-5-13ARP10
+Uptime       : up 2 hours, 42 minutes
+Disk /       : /dev/nvme0n1p5   98G   13G   81G  14% /
+Memory used  : 3.5Gi/12Gi
+Total processes : 408
 Health status   : HEALTHY
 ====================

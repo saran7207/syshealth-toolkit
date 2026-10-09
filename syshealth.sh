@@ -84,6 +84,28 @@ check_cpu_usage() {
 	fi
 }
 
+run_health_checks() {
+	local overall_status=0
+	print_status "CHECK" "Running system health analysis..."
+	
+	for mount in / /home /var; do
+		if ! check_disk_usage "$mount"; then
+			overall_status=1
+		fi
+	done
+	
+	if ! check_memory_usage; then
+		overall_status=1
+	fi
+	
+	if ! check_cpu_usage; then
+		overall_status=1
+	fi
+	
+	HEALTH_STATUS="$overall_status"
+	return "$overall_status"
+}
+
 # ========================================
 # Variables and demonstrating how to quote
 # ========================================

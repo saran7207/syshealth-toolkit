@@ -106,6 +106,10 @@ run_health_checks() {
 	return "$overall_status"
 }
 
+parse_arguments() {
+	OUTPUT_FILE="${1:-}" 
+}
+
 # ========================================
 # Variables and demonstrating how to quote
 # ========================================
@@ -232,18 +236,26 @@ OUTPUT_FILE="${1:-}"
 # If command succeeds, run A; otherwise run B.
 # Only one of the two echoes will run.
 # ===============================
-print_report() 
-{
-# Using printf for consistent formatting
-printf "====================\n"
-printf "System Health Report - %s\n" "$CURRENT_DATE" # prints health report
-printf "Hostname     : %s\n" "$HOSTNAME" # prints hostname
-printf "Uptime       : %s\n" "$UPTIME" # prints uptime
-printf "Disk /       : %s\n" "$DISK_USAGE" # prints disk
-printf "Memory used  : %s\n" "$MEMORY_USAGE" # prints memory used
-printf "Total processes : %s\n" "$PROCESS_COUNT" # prints total proceses
-printf "Health status   : %s\n" "$([ "$HEALTH_STATUS" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - See alerts above")"
-printf "====================\n"
+generate_report() {
+	local CURRENT_DATE HOSTNAME UPTIME DISK_USAGE MEMORY_USAGE PROCESS_USAGE
+	
+	HOSTNAME=$(hostname) # holds the output from hostname command
+	CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S') # hold the value from the date command
+	UPTIME=$(uptime -p) # how long the machine is running
+	DISK_USAGE=$(df -h / | tail -1) # storage usage
+	MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}') # RAM usage
+	PROCESS_COUNT=$(ps -e | wc -l) # processes running
+	
+	# Using printf for consistent formatting
+	printf "====================\n"
+	printf "System Health Report - %s\n" "$CURRENT_DATE" # prints health report
+	printf "Hostname     : %s\n" "$HOSTNAME" # prints hostname
+	printf "Uptime       : %s\n" "$UPTIME" # prints uptime
+	printf "Disk /       : %s\n" "$DISK_USAGE" # prints disk
+	printf "Memory used  : %s\n" "$MEMORY_USAGE" # prints memory used
+	printf "Total processes : %s\n" "$PROCESS_COUNT" # prints total proceses
+	printf "Health status   : %s\n" "$([ "$HEALTH_STATUS" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY - See alerts 		above")"
+	printf "====================\n"
 }
 
 # ===========================

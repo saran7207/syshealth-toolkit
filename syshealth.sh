@@ -174,13 +174,18 @@ generate_report() {
 	# Using printf for consistent formatting
 	printf "====================\n"
 	printf "System Health Report - %s\n" "$CURRENT_DATE" # prints health report
-	printf "Hostname     : %s\n" "$HOSTNAME" # prints hostname
-	printf "Uptime       : %s\n" "$UPTIME" # prints uptime
-	printf "Disk /       : %s\n" "$DISK_USAGE" # prints disk
-	printf "Memory used  : %s\n" "$MEMORY_USAGE" # prints memory used
+	printf "Hostname        : %s\n" "$HOSTNAME" # prints hostname
+	printf "Uptime          : %s\n" "$UPTIME" # prints uptime
+	printf "Disk /          : %s\n" "$DISK_USAGE" # prints disk
+	printf "Memory used     : %s\n" "$MEMORY_USAGE" # prints memory used
 	printf "Total processes : %s\n" "$PROCESS_COUNT" # prints total processes
 	printf "Health status   : %s\n" "$([[ "${HEALTH_STATUS:-0}" -eq 0 ]] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")"
 	printf "====================\n"
+	
+	printf "\n===================\n"
+	printf "LOG ANALYSIS SUMMARY\n"
+	printf "\n===================\n"
+	analyze_logs
 }
 
 # Run the program from start to finish

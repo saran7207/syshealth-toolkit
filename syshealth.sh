@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ==============================
 # syshealth.sh - System health & Log analysis toolkit
-# Lab 3 - Refactoring into Functions
+# Lab 4 - Log analysis integration
 # Author: Saran saai dommaraju
-# Date: 2026-10-09
+# Date: 2026-10-18
 # ==============================
 
 # ================================
@@ -122,32 +122,54 @@ run_health_checks() {
 	return "$overall_status"
 }
 
+# Analyze a log file and summarize important events
 analyze_logs() {
-	local log_file="${1:-/var/log}"
+	# Set the log file path from the first argument or use the default path
+	# Allow the user to provide a log file while keeping a default path when no argument is given
+	local log_file="${1:-/var/log/syslog}"
+	# Initialize counters for errors warnings and failed login attempts
 	local errors=0
 	local warnings=0
 	local failed_logins=0
+	# Declare a variable for storing the most common issues
 	local top_issues
 	
+	# Check whether the log file exists and can be read
+	# Check readability instead of existence because the script needs permission to read the log file
 	if [[ ! -r "$log_file" ]]; then
+		# Display a message when the log file cannot be accessed
 		printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
 		printf "  Log file not readable or does not exist on this system.\n"
 		printf "  (This is normal in some containers or minimal installs.)\n"
+		# Stop log analysis and return a successful status
+		# Treat unavailable logs as a non fatal condition so the remaining system report can still be generated
 		return 0
 	fi
 	
+	# Count the number of error messages in the log file
+	# Count matching log lines regardless of letter case and suppress error messages when the log cannot be read
 	errors=$(grep -E -i 'ERROR|Error|error' "$log_file" 2>/dev/null | wc -l)
-	warnings=$(grep -E -i 'WARNING\Warning\warning' "$log_file" 2>/dev/null | wc -l)
+	# Count the number of warning messages in the log file
+	warnings=$(grep -E -i 'WARNING|Warning|warning' "$log_file" 2>/dev/null | wc -l)
+	# Count failed login attempts and authentication failures
 	failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l)
 	
+	# Display the five most frequently occurring issues in the log file
+	# Find important log messages and group identical messages to identify recurring issues
+	# Remove the timestamp and other text before the message
+	# Sort the messages alphabetically
+	# Count how many times each identical message appears
+	# Sort the messages by frequency from highest to lowest
+	# Keep only the five most frequent messages
 	printf "\nTop 5 recurring issues:\n"
-	grep -E -i 'ERROR|error|Error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null \
+	grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null \
 	| sed 's/.*\]: //' \
-	| sort | sort \
+	| sort \
 	| uniq -c \
 	| sort -nr \
 	| head -5
 	
+	# Display a summary of the log analysis results
 	printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
 	printf " Errors : %d\n" "$errors"
 	printf " Warnings : %d\n" "$warnings"
@@ -182,9 +204,10 @@ generate_report() {
 	printf "Health status   : %s\n" "$([[ "${HEALTH_STATUS:-0}" -eq 0 ]] && echo "HEALTHY" || echo "UNHEALTHY - see alerts above")"
 	printf "====================\n"
 	
+	# Include log analysis in the report so system health and log findings are presented together
 	printf "\n===================\n"
 	printf "LOG ANALYSIS SUMMARY\n"
-	printf "\n===================\n"
+	printf "===================\n"
 	analyze_logs
 }
 

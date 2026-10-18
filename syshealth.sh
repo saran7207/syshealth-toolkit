@@ -123,7 +123,7 @@ run_health_checks() {
 }
 
 analyze_logs() {
-	local log_file="${1:-/var/log/messages}"
+	local log_file="${1:-/var/log}"
 	local errors=0
 	local warnings=0
 	local failed_logins=0
@@ -140,7 +140,7 @@ analyze_logs() {
 	warnings=$(grep -E -i 'WARNING\Warning\warning' "$log_file" 2>/dev/null | wc -l)
 	failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l)
 	
-	printf("\nTop 5 recurring issues:\n"
+	printf "\nTop 5 recurring issues:\n"
 	grep -E -i 'ERROR|error|Error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null \
 	| sed 's/.*\]: //' \
 	| sort | sort \
